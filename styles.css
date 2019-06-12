@@ -1,0 +1,143 @@
+html,body{
+    /* 游戏背景 */
+    background: #4e4b53;
+
+    /* 禁用滚动条 */
+    /* overflow: hidden; */
+    
+    /* 设置鼠标样式 */
+    cursor: url('images/cursor.cur'), default;
+    
+    height:100%;
+    width:100%;
+
+    margin: 0;
+    padding: 0;
+    
+    position: relative;
+
+    /* 底光 */
+    /* background: radial-gradient(ellipse at bottom, #fff -300%, #090a0f 100%); */
+    
+    /* 渐变背景 */
+    background-image:
+    repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+    repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+    linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)),
+    linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
+    background-size: 70px 120px;
+
+    /* background: url(images/screens/splashscreen1.png) no-repeat;
+    background-size: 100% auto; */
+
+}
+
+#gamecontainer{
+    width: 640px;
+    height: 480px;
+    /* 边框 */
+    border: 1px solid red;
+    position: absolute;
+    /* 取巧居中 */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+    /* 缓动 */
+    transition:all 0.5s;
+    
+}
+
+/* 基础游戏默认样式 */
+.gamelayer{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    /* display: none; */
+}
+
+/* 游戏开始界面与主菜单 */
+#gamestartscreen{
+    background: #63d0ff;
+    margin: 0;
+    /* 顶部距离 */
+    padding-top: 20px;
+    
+    /* 文本的水平对齐方式 */
+    text-align: center;
+
+    /* 左边距离 */
+    /* padding-left: 50px; */
+
+    width: 100%;
+    height: 100%;
+
+    /* 内容溢出隐藏 */
+    overflow: hidden;
+}
+
+#gamestartscreen p{
+    /* 外边距属性 */
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    /* 字体 */
+    font-family: 'Courier New', Courier, monospace;
+    /* 字体大小 */
+    font-size: 30px;
+    /* 鼠标样式改变 */
+    cursor: url('images/hand.cur'), pointer;
+    /* 字体颜色 */
+    color: white;
+    /* 字体阴影 */
+    text-shadow: -2px 0 purple, 0 2px purple, 2px 0 purple, 0 -2px purple;
+}
+
+#gamestartscreen p:hover{
+    color: yellow;
+}
+
+#gametitle {
+    position: relative;
+    margin-top: 100px!important;
+    margin-bottom: 30px!important;
+    text-align: center;
+    width: 100%;
+    
+    font-family: "Courier New", Courier, monospace;
+    font-size: 60px!important;
+    line-height: 60px;
+
+    color: white;
+    text-shadow: -2px 0 purple, 0 2px purple, 2px 0 purple, 0 -2px purple;
+    z-index:3;
+}
+
+#clouds{
+    background:url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/56901/bg-clouds2-tinypng.png") repeat-x 0 top #63d0ff;
+    width:100%;
+    height:230px; /*190px*/
+    min-height:230px;
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:1;
+    -webkit-transform:translate3d(0,0,0.01);
+    transform:translate3d(0,0,0.01);
+  }
+
+  #ground {
+    background:url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/56901/grass_tile-tinypng.png") repeat-x 0 0 transparent;    
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index:2;
+    width: 100%;
+    height: 192px;
+    min-height:192px;
+    border:0 none transparent;
+    outline:0 none transparent;
+    -webkit-transform:translate3d(0,0,0.01);
+    transform:translate3d(0,0,0.01);
+    will-change: transform;
+  }
