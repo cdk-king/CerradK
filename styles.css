@@ -53,7 +53,7 @@ html,body{
     width: 100%;
     height: 100%;
     position: absolute;
-    /* display: none; */
+    display: none;
 }
 
 /* 游戏开始界面与主菜单 */
@@ -61,7 +61,6 @@ html,body{
     background: #63d0ff;
     margin: 0;
     /* 顶部距离 */
-    padding-top: 20px;
     
     /* 文本的水平对齐方式 */
     text-align: center;
@@ -115,24 +114,26 @@ html,body{
 
 #clouds{
     background:url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/56901/bg-clouds2-tinypng.png") repeat-x 0 top #63d0ff;
-    width:100%;
-    height:230px; /*190px*/
-    min-height:230px;
+    width:2247px;
+    height:190px; /*190px*/
+    min-height:190px;
     position:absolute;
     top:0;
-    left:0;
+    left:-1607px;
     z-index:1;
     -webkit-transform:translate3d(0,0,0.01);
     transform:translate3d(0,0,0.01);
+    -webkit-animation: orbmove 35s linear infinite;
+    animation: orbmove 35s linear infinite;
   }
 
   #ground {
     background:url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/56901/grass_tile-tinypng.png") repeat-x 0 0 transparent;    
     position: absolute;
     bottom: 0;
-    left: 0;
+    left: -1962px;
     z-index:2;
-    width: 100%;
+    width: 2602px;
     height: 192px;
     min-height:192px;
     border:0 none transparent;
@@ -140,4 +141,78 @@ html,body{
     -webkit-transform:translate3d(0,0,0.01);
     transform:translate3d(0,0,0.01);
     will-change: transform;
+    -webkit-animation: groundmove 30s linear infinite;
+    animation: groundmove 30s linear infinite;
   }
+
+  @-webkit-keyframes orbmove {
+    from {
+      -webkit-transform: translateX(0px);
+    }
+    to {
+      -webkit-transform: translateX(1122px);
+    }
+  }
+  @keyframes orbmove {
+    from {
+      transform: translateX(0px);
+    }
+    to {
+      transform: translateX(1122px);
+    }
+  }
+
+  @-webkit-keyframes groundmove {
+    from {
+      -webkit-transform: translateX(0px);
+    }
+    to {
+      -webkit-transform: translateX(1301px);
+    }
+  }
+  @keyframes groundmove {
+    from {
+      transform: translateX(0px);
+    }
+    to {
+      transform: translateX(1301px);
+    }
+  }
+
+
+  /* 加载画面 */
+#loadingscreen{
+    background: rgba(27, 27, 27, 0.9);
+    z-index: 10;
+}
+
+#loadingmessage{
+    margin-top: 400px;
+    text-align: center;
+    height: 48px;
+    color: white;
+    /* background: url(images/loader.gif) no-repeat center; */
+    font: 12px Arial;
+}
+
+/*游戏界面*/
+
+#gameinterfacescreen{
+    text-align: center;
+    width: 100%;
+    /* border:1px solid red; */
+}
+
+#gameinterfacescreen canvas{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+#gameinterfacescreen #foregroundcanvas{
+    z-index: 1;
+}
+
+#gameinterfacescreen #backgroundcanvas{
+    z-index: 0;
+}
