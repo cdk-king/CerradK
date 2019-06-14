@@ -14,7 +14,8 @@ window.addEventListener("resize", function() {
 var game = {
     init:function(){
         loader.init();
-        
+        keyboard.init();
+
         game.hideScreens();
         game.showScreen("gamestartscreen");
         game.initCanvases();
@@ -38,6 +39,48 @@ var game = {
         var screen = document.getElementById(id);
 
         screen.style.display = "block";
+    },
+    showMessageBox:function(message,onOk,onCancel){
+        //设置消息框文本
+        let messageBoxText = document.getElementById("messageboxtext");
+        messageBoxText.style.display = ""; 
+        messageBoxText.innerHTML = message.replace(/\n/g, "<br><br>");
+
+        //设置消息框ok和cancel按钮处理函数，启用按钮
+        if(!onOk){
+            game.messageBoxOkCallback = undefined;
+        }else{
+            game.messageBoxOkCallback = onOk;
+        }
+
+        let cancelButton = document.getElementById("messageboxcancel");
+
+        if(!onCancel){
+            game.messageBoxCancelCallback = undefined;
+            cancelButton.style.display = "none";
+        }else{
+            game.messageBoxCancelCallback = onCancel;
+            // Hide the cancel button
+            cancelButton.style.display = "";
+        }
+        //显示消息框并等待用户响应
+        game.showScreen("messageboxscreen");
+    },
+    messageBoxOK:function(){
+        let messageBoxText = document.getElementById("messageboxtext");
+        messageBoxText.style.display = "none";
+
+        if(game.messageBoxOkCallback){
+            game.messageBoxOkCallback();
+        }
+    },
+    messageBoxCancel:function(){
+        let messageBoxText = document.getElementById("messageboxtext");
+        messageBoxText.style.display = "none";
+
+        if(game.messageBoxCancelCallback){
+            game.messageBoxCancelCallback();
+        }
     },
     canvasWidth: 640,
     canvasHeight: 480,
@@ -68,6 +111,7 @@ var game = {
         game.refreshBackground = true;
         game.backgroundImage = loader.loadImage("images/background/bit24.png");
 
+        //加载器加载完后才开始绘制
         loader.onload = function(){
             game.drawingLoop();
         }
@@ -87,5 +131,5 @@ var game = {
         if(game.running){
             //游戏绘画循环
         }
-    }
+    },
 }
