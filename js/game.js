@@ -82,6 +82,111 @@ var game = {
             game.messageBoxCancelCallback();
         }
     },
+    initOffsets: function() {
+		this.bgVelocity = 50;
+		this.backgroundOffset = 0;
+		this.platformOffset = 0;
+		this.spriteOffset = 0
+	},
+    resetOffsets: function() {
+		this.bgVelocity = 0;
+		this.backgroundOffset = 0;
+		this.platformOffset = 0;
+		this.spriteOffset = 0
+	},
+    drawBackground: function() {
+		//偏移坐标系
+		game.backgroundContext.translate(-game.backgroundOffset, 0);
+		game.backgroundContext.drawImage(game.backgroundImage, 0,0,game.backgroundWidth,game.canvasHeight);
+		game.backgroundContext.drawImage(game.backgroundImage, game.backgroundWidth, 0,game.backgroundWidth,game.canvasHeight);
+		//恢复坐标系
+		game.backgroundContext.translate(game.backgroundOffset, 0);
+    },
+    setBackgroundOffset: function(now) {
+
+		game.backgroundOffset += game.bgVelocity * (now - game.lastAnimationFrameTime) / 1000;
+        //console.log(game.backgroundOffset);
+		if(game.backgroundOffset < 0 || game.backgroundOffset > game.backgroundWidth) {
+			
+			if(game.backgroundOffset > game.backgroundWidth){
+				game.backgroundOffset = 0;
+			}
+			if(game.backgroundOffset < 0){
+				game.backgroundOffset = game.backgroundWidth;
+			}
+		}
+    },
+    setSpriteOffsets: function(now) {
+        //game.spriteOffset += game.spriteVelocity * (now - game.lastAnimationFrameTime) / 1000;
+        //game.spriteOffset
+    },
+	calculateFps: function(now) {
+		game.fps = 1 / (now - game.lastAnimationFrameTime) * 1000 * game.timeRate;
+		//console.log(now - this.lastAnimationFrameTime);
+		if(now - game.lastFpsUpdateTime > 1000) {
+			game.lastFpsUpdateTime = now;
+			game.fpsElement.innerHTML = game.fps.toFixed(0) + ' fps';
+			//console.log(fps.toFixed(0));
+		}
+		return game.fps;
+    },
+    resetArrays: function() {
+        game.idCounter = 0;
+        game.items = [];
+        game.buildings = [];
+        game.vehicles = [];
+        game.aircraft = [];
+        game.terrain = [];
+        game.hero = [];
+
+        game.selectedItems = [];
+
+        game.triggeredEvents = [];
+        game.sortedItems = [];
+        game.bullets = [];
+    },
+    loadType:function(){
+        game.resetArrays();
+        for(var type in maps.singleplayer[0].requirements){
+            var requirementArray = maps.singleplayer[0].requirements[type];
+            for(var i = 0;i<requirementArray.length;i++){
+                var name = requirementArray[i];
+                if(window[type]){
+                    //console.log(window[type]);
+                    window[type].load(name);
+                    console.log("加载完成"+type);
+                }else{
+                    console.log("找不到"+type);
+                }
+            }
+        }
+        game.addItems();
+    },
+    addItems:function(){
+        for(var i =  maps.singleplayer[0].items.length-1;i>=0;i--){
+            var itemDetails = maps.singleplayer[0].items[i];
+            game.addItem(itemDetails);
+        }
+        console.log("item加载完毕");
+    },
+    addItem:function(itemDetails){
+        //为每个单位项设置唯一的id
+        if(!itemDetails.uid){   
+            itemDetails.uid = ++game.idCounter;
+        }
+        //判断是否已添加
+        if(itemDetails.isAdd){
+            var item = itemDetails;
+        }else{
+            var item = window[itemDetails.type].add(itemDetails);
+        }
+        //将单位项加入items数组
+        game.items.push(item);
+        //将单位项加入指定的单位类型数组
+        game[item.type].push(item);
+
+        return item;
+    },
     canvasWidth: 640,
     canvasHeight: 480,
     initCanvases:function(){
@@ -109,27 +214,61 @@ var game = {
 
         game.running = true;
         game.refreshBackground = true;
-        game.backgroundImage = loader.loadImage("images/background/bit24.png");
+        game.backgroundImage = loader.loadImage("images/background/Background_1.png");
+        game.backgroundWidth = 1024;
+
+        game.initOffsets();
+
+        //加载关卡的预加载单位类型
+        game.loadType();
 
         //加载器加载完后才开始绘制
         loader.onload = function(){
+            game.lastAnimationFrameTime = new Date().getTime();
             game.drawingLoop();
         }
         
     },
+    end:function(){
+        game.running = false;
+    },
+    animationLoop:function(now){
+        game.setBackgroundOffset(now);
+    },
     drawingLoop:function(){
+        var now = new Date().getTime();
+        //console.log(now - game.lastAnimationFrameTime);
+        game.animationLoop(now);
+
+        //清空前景
+        game.foregroundContext.clearRect(0,0,game.canvasWidth,game.canvasHeight);
+
+        game.backgroundContext.clearRect(0,0,game.canvasWidth,game.canvasHeight);
 
         if(game.refreshBackground){
             //绘制游戏背景
             
-            game.backgroundContext.drawImage(game.backgroundImage,0,0,
-            game.canvasWidth,game.canvasHeight,0,0,game.canvasWidth,game.canvasHeight);
-            game.refreshBackground = false;
+            // game.backgroundContext.drawImage(game.backgroundImage,game.offsetX,game.offsetY,
+            // game.canvasWidth,game.canvasHeight,0,0,game.canvasWidth,game.canvasHeight);
+
+            game.drawBackground();            
+
+            //game.refreshBackground = false;
             
         }
+
+        //开始绘制前景元素
+        //深度排序确保近的物体遮挡远的物体
+        for(var i = 0;i<=game.items.length-1;i++){
+                game.items[i].draw();
+                //console.log("draw"+game.items[i].name);
+        }
         
+        game.lastAnimationFrameTime = new Date().getTime();
+
         if(game.running){
             //游戏绘画循环
+            requestAnimationFrame(game.drawingLoop);
         }
     },
 }

@@ -15,6 +15,7 @@ var keyboard = {
                         if(game.running){
                             game.showMessageBox("是否退回菜单界面",function(){
                                 //game.end();
+                                game.running = false;
                                 game.hideScreens();
                                 game.showScreen("gamestartscreen");
                             },function(){
@@ -22,6 +23,37 @@ var keyboard = {
                             });
                         }
                         break;
+                    case "65":
+                        //keyCode 65 = a A
+                        console.log("按 a");
+                        if(game.running){
+                            //game.offsetX--;
+                            //game.refreshBackground = true;
+                        }
+                        break;
+                    case "68":
+                        //keyCode 68 = d D
+                        console.log("按 d");
+                        if(game.running){
+                            //game.offsetX++;
+                            //game.refreshBackground = true;
+                        }
+                        break;
+                    case "83":
+                        //keyCode 83 = s S
+                        console.log("按 s");
+                        if(game.running){
+                            
+                        }
+                        break;
+                    case "87":
+                        //keyCode 87 = w W
+                        console.log("按 w");
+                        if(game.running){
+                            
+                        }
+                        break;
+                    
                 }
             }
             
