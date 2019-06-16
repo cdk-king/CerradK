@@ -83,7 +83,7 @@ var game = {
         }
     },
     initOffsets: function() {
-		this.bgVelocity = 50;
+		this.bgVelocity = 0;
 		this.backgroundOffset = 0;
 		this.platformOffset = 0;
 		this.spriteOffset = 0
@@ -101,6 +101,9 @@ var game = {
 		game.backgroundContext.drawImage(game.backgroundImage, game.backgroundWidth, 0,game.backgroundWidth,game.canvasHeight);
 		//恢复坐标系
 		game.backgroundContext.translate(game.backgroundOffset, 0);
+    },
+    setGameOffsetX:function(now){
+        game.offsetX += game.bgVelocity * (now - game.lastAnimationFrameTime) / 1000;
     },
     setBackgroundOffset: function(now) {
 
@@ -187,6 +190,21 @@ var game = {
 
         return item;
     },
+    BACKGROUND_VELOCITY:50,
+    turnLeft:function(){
+        game.bgVelocity = -game.BACKGROUND_VELOCITY;
+        game.hero[0].running = true;
+		game.hero[0].direction = 0;
+	},
+	turnRight:function(){
+        game.bgVelocity = this.BACKGROUND_VELOCITY;
+        game.hero[0].running = true;
+		game.hero[0].direction = 1;
+    },
+    turnStand:function(){
+        game.bgVelocity = 0;
+        game.hero[0].running = false;
+    },
     canvasWidth: 640,
     canvasHeight: 480,
     initCanvases:function(){
@@ -205,6 +223,10 @@ var game = {
     },
     running:false,
     refreshBackground:false,
+    //地图被分割成20像素*20像素的方向网格
+    gridSize:16,
+    currentMapPassableGrid:[],
+    currentMapTerrainGrid:[],
     //地图平移偏移量
     offsetX:0,
     offsetY:0,
@@ -222,6 +244,25 @@ var game = {
         //加载关卡的预加载单位类型
         game.loadType();
 
+        //加载地形
+        maps.createFlatTerrain("soil",-10,26,50,4);
+
+        //创建网格，将不可通过的网格单位赋值1，可通行的赋值0
+        game.currentMapTerrainGrid = [];
+        for(var y = 0;y<50;y++){
+            game.currentMapTerrainGrid[y] = [];
+            for(var x = 0;x<100;x++){
+                game.currentMapTerrainGrid[y][x] = 0;
+            }
+        };
+
+        for(var i= game.terrain.length-1;i>=0;i--){
+            var item = game.terrain[i];
+            game.currentMapTerrainGrid[item.y][item.x] = 1;
+        };
+
+        console.log(game.currentMapTerrainGrid);
+
         //加载器加载完后才开始绘制
         loader.onload = function(){
             game.lastAnimationFrameTime = new Date().getTime();
@@ -234,6 +275,12 @@ var game = {
     },
     animationLoop:function(now){
         game.setBackgroundOffset(now);
+
+        game.setGameOffsetX(now);
+
+        for(var i = 0;i<=game.items.length-1;i++){
+            game.items[i].animate();
+        }
     },
     drawingLoop:function(){
         var now = new Date().getTime();
@@ -260,8 +307,7 @@ var game = {
         //开始绘制前景元素
         //深度排序确保近的物体遮挡远的物体
         for(var i = 0;i<=game.items.length-1;i++){
-                game.items[i].draw();
-                //console.log("draw"+game.items[i].name);
+             game.items[i].draw();
         }
         
         game.lastAnimationFrameTime = new Date().getTime();

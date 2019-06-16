@@ -17,12 +17,15 @@ var maps = {
                 "buildings":[],
                 "vehicles":[],
                 "aircraft":[],
-                "terrain":[]
+                "terrain":["soil"]
             },
             "cash":0,
             //预加载的单位项
             "items":[
                 {"type":"hero","name":"cdk",x:100,y:180,"life":100},
+                // {"type":"terrain","name":"soil",x:300,y:416,"life":10},
+                // {"type":"terrain","name":"soil",x:316,y:416,"life":10},
+                // {"type":"terrain","name":"soil",x:332,y:416,"life":10},
 
             ],
             
@@ -49,5 +52,15 @@ var maps = {
                 },
             ]
         },
-    ]
+    ],
+    createFlatTerrain:function(terrainName,x,y,widthNum,heightNum){
+        var item = {"type":"terrain","name":terrainName,x:x,y:y,"life":10};
+        for(var i = 0;i<widthNum;i++){
+            for(var j = 0;j<heightNum;j++){
+                var re = game.addItem(item);
+                re.x  = x + i;
+                re.y  = y + j;
+            }
+        }
+    }
 }

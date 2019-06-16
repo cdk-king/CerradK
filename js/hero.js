@@ -8,14 +8,17 @@ var hero = {
             weaponType:"赤手空拳",
             //weaponType:"rocket",
 
+            isSheet:true,
+            sheetName:"桐人",
+
             x:0,
             y:0,
             
-            width:52,
-            height:75,
+            width:32,
+            height:47,
             
-            pixelWidth:52,
-            pixelHeight:75,
+            pixelWidth:32,
+            pixelHeight:47,
             pixelOffsetX:0,
             pixelOffsetY:0,
 
@@ -27,16 +30,18 @@ var hero = {
             turnSpeed:4,
             pixelShadowHeight:40,
             spriteImages:[
-                // {name:"stand",count:1,directions:2},
-                {name:"run",count:9,directions:2}
+                //{name:"stand",count:1,directions:2},
+                //{name:"run",count:9,directions:2}
+                {name:"run",count:4,directions:2} 
             ],
         },
     },
     defaults:{
         type:"hero",
         animationIndex:0,
-        direction:0,
+        direction:1,
         directions:2,
+        imageOffset:2,
         action:"stand",
         selected:false,
         selectable:true,
@@ -45,6 +50,7 @@ var hero = {
         velocityX:0,
         velocityY:0,
         behaviors:[],
+        lastAdvanceTime:0,
         orders:{
             type:"stand"
         },
@@ -59,6 +65,25 @@ var hero = {
             }else{
                 this.lifeCode = "damaged";
             }
+
+            //设置imageOffset
+            if(this.lastAdvanceTime==0){
+                this.lastAdvanceTime = new Date().getTime();
+            }
+            if(this.running){
+                var now = new Date().getTime();
+                if(now-this.lastAdvanceTime > 100){
+                    this.imageOffset++;
+                    if(this.imageOffset>=this.spriteImages[0].count){
+                        this.imageOffset=0;
+                    }
+                    //console.log(this.imageOffset);
+                    this.lastAdvanceTime = now;
+                }
+                
+            }else{
+                this.imageOffset =  0;
+            }
         },
         draw:function(){
             var x = 300;
@@ -70,10 +95,8 @@ var hero = {
                 //this.drawSelection();
                 this.drawLifeBar();
             }
-            //console.log(this.imageOffset);
-            this.imageOffset = 2;
-            this.direction = 1;
-            game.foregroundContext.drawImage(this.spriteSheet,this.imageOffset*this.pixelWidth,this.direction*this.pixelHeight,
+
+            game.foregroundContext.drawImage(this.spriteSheet,this.imageOffset*this.pixelWidth,(this.direction+1)*this.pixelHeight,
                 this.pixelWidth,this.pixelHeight,x,y,this.pixelWidth,this.pixelHeight);
 
             //绘制出现的光圈
