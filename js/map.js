@@ -8,8 +8,8 @@ var maps = {
             "mapImage":"images/maps/plains-debug.png",
             "startX":36,
             "startY":0,
-            "mapGridWidth":60,
-            "mapGridHeight":40,
+            "mapGridWidth":100,
+            "mapGridHeight":50,
             "mapObstructedTerrain": [],
             //预加载的单位类型
             "requirements":{
@@ -22,7 +22,7 @@ var maps = {
             "cash":0,
             //预加载的单位项
             "items":[
-                {"type":"hero","name":"cdk",x:100,y:180,"life":100},
+                {"type":"hero","name":"cdk",x:20,y:15,"life":100},
                 // {"type":"terrain","name":"soil",x:300,y:416,"life":10},
                 // {"type":"terrain","name":"soil",x:316,y:416,"life":10},
                 // {"type":"terrain","name":"soil",x:332,y:416,"life":10},

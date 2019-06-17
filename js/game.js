@@ -190,7 +190,7 @@ var game = {
 
         return item;
     },
-    BACKGROUND_VELOCITY:50,
+    BACKGROUND_VELOCITY:150,
     turnLeft:function(){
         game.bgVelocity = -game.BACKGROUND_VELOCITY;
         game.hero[0].running = true;
@@ -230,35 +230,47 @@ var game = {
     //地图平移偏移量
     offsetX:0,
     offsetY:0,
+    
     start:function(){
         game.hideScreens();
-        game.showScreen("gameinterfacescreen");
+        
+        game.timeSystem = new TimeSystem();
+        game.timeSystem.start();
 
         game.running = true;
         game.refreshBackground = true;
         game.backgroundImage = loader.loadImage("images/background/Background_1.png");
         game.backgroundWidth = 1024;
 
+        var map = maps.singleplayer[0];
+
+        game.currentMap = map;
+
+        develop.init();
+
         game.initOffsets();
 
         //加载关卡的预加载单位类型
         game.loadType();
 
+        //装备跌落系统
+        hero.equipFalling();
+
         //加载地形
-        maps.createFlatTerrain("soil",-10,26,50,4);
+        maps.createFlatTerrain("soil",-10,26,60,4);
 
         //创建网格，将不可通过的网格单位赋值1，可通行的赋值0
         game.currentMapTerrainGrid = [];
-        for(var y = 0;y<50;y++){
-            game.currentMapTerrainGrid[y] = [];
-            for(var x = 0;x<100;x++){
-                game.currentMapTerrainGrid[y][x] = 0;
+        for(var x = -50;x<150;x++){
+            game.currentMapTerrainGrid[x] = [];
+            for(var y = 0;y<50;y++){
+                game.currentMapTerrainGrid[x][y] = 0;
             }
         };
 
-        for(var i= game.terrain.length-1;i>=0;i--){
+        for(var i= 0;i<game.terrain.length;i++){
             var item = game.terrain[i];
-            game.currentMapTerrainGrid[item.y][item.x] = 1;
+            game.currentMapTerrainGrid[item.x][item.y] = 1;
         };
 
         console.log(game.currentMapTerrainGrid);
@@ -266,6 +278,7 @@ var game = {
         //加载器加载完后才开始绘制
         loader.onload = function(){
             game.lastAnimationFrameTime = new Date().getTime();
+            game.showScreen("gameinterfacescreen");
             game.drawingLoop();
         }
         
@@ -281,6 +294,8 @@ var game = {
         for(var i = 0;i<=game.items.length-1;i++){
             game.items[i].animate();
         }
+
+        //develop.animate();
     },
     drawingLoop:function(){
         var now = new Date().getTime();
@@ -306,10 +321,12 @@ var game = {
 
         //开始绘制前景元素
         //深度排序确保近的物体遮挡远的物体
-        for(var i = 0;i<=game.items.length-1;i++){
+        for(var i = game.items.length-1;i>=0;i--){
              game.items[i].draw();
         }
         
+        //develop.draw();
+
         game.lastAnimationFrameTime = new Date().getTime();
 
         if(game.running){
