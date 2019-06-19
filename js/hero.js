@@ -151,18 +151,23 @@ var hero = {
             //todo
             //二维数组可以存item的id
 
-            var x = Math.floor(sprite.x);
+            var x = Math.floor((sprite.x*game.gridSize+game.offsetX)/game.gridSize);
             //var y = Math.floor(sprite.y+sprite.pixelHeight/game.gridSize);
-            var y = Math.floor(sprite.y)+3;
+            var y = Math.floor(sprite.y+game.offsetY)+3;
 
             var re = game.currentMapTerrainGrid[x][y];
+            var item = game.getItemByUid(re);
+
+            console.log(item);
+
+            //console.log(x);
 
             //重新校准
-            if(re==1){
+            if(re!=0){
                 sprite.y = y-3;
             }
 
-            return (re==1);
+            return (re!=0);
         },
 		//e sprite | d now | b last
 		moveDown: function(sprite,now,lastAnimationFrameTime) {
@@ -190,6 +195,8 @@ var hero = {
 					sprite.stopFalling();
 				}
 			} else {
+                console.log(sprite.falling);
+                console.log(!this.JudgeBelowHasObstacle(sprite));
                 //判断是否在跳跃过程中，或者是否下方无障碍物
 				if(!sprite.jumping && !this.JudgeBelowHasObstacle(sprite)) {
                     sprite.fall(); 	

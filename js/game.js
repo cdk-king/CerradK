@@ -205,6 +205,14 @@ var game = {
         game.bgVelocity = 0;
         game.hero[0].running = false;
     },
+    getItemByUid:function(uid){
+        for(var i = 0;i<game.items.length;i++){
+            if(game.items[i].uid==uid){
+                return game.items[i];
+            }
+        }
+        return false;
+    },
     canvasWidth: 640,
     canvasHeight: 480,
     initCanvases:function(){
@@ -270,7 +278,7 @@ var game = {
 
         for(var i= 0;i<game.terrain.length;i++){
             var item = game.terrain[i];
-            game.currentMapTerrainGrid[item.x][item.y] = 1;
+            game.currentMapTerrainGrid[item.x][item.y] = item.uid;
         };
 
         console.log(game.currentMapTerrainGrid);
