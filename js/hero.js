@@ -156,18 +156,27 @@ var hero = {
             var y = Math.floor(sprite.y+game.offsetY)+3;
 
             var re = game.currentMapTerrainGrid[x][y];
-            var item = game.getItemByUid(re);
+            var left = game.currentMapTerrainGrid[x-1][y];
+            var right = game.currentMapTerrainGrid[x+1][y];
 
-            console.log(item);
+            if(right==0){
+                //重新校准
+                if(re!=0){
+                    sprite.y = y-3;
+                }
+
+                return (re!=0);
+            }
+
+            return true; 
+
+            //var item = game.getItemByUid(re);
+
+            //console.log(item);
 
             //console.log(x);
 
-            //重新校准
-            if(re!=0){
-                sprite.y = y-3;
-            }
-
-            return (re!=0);
+            
         },
 		//e sprite | d now | b last
 		moveDown: function(sprite,now,lastAnimationFrameTime) {
@@ -195,8 +204,8 @@ var hero = {
 					sprite.stopFalling();
 				}
 			} else {
-                console.log(sprite.falling);
-                console.log(!this.JudgeBelowHasObstacle(sprite));
+                //console.log(sprite.falling);
+                //console.log(!this.JudgeBelowHasObstacle(sprite));
                 //判断是否在跳跃过程中，或者是否下方无障碍物
 				if(!sprite.jumping && !this.JudgeBelowHasObstacle(sprite)) {
                     sprite.fall(); 	
