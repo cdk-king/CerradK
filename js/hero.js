@@ -167,25 +167,14 @@ var hero = {
 
                 return (re!=0);
             }
-
             return true; 
-
             //var item = game.getItemByUid(re);
-
-            //console.log(item);
-
-            //console.log(x);
-
-            
         },
 		//e sprite | d now | b last
 		moveDown: function(sprite,now,lastAnimationFrameTime) {
 			var c;
 			this.setSpriteVelocity(sprite, lastAnimationFrameTime);
             c = this.calculateVerticalDrop(sprite,now,lastAnimationFrameTime);
-            
-            //console.log(sprite.velocityY)
-            //console.log(c);
 
             if(this.JudgeBelowHasObstacle(sprite)) {
                 sprite.stopFalling();
@@ -204,13 +193,137 @@ var hero = {
 					sprite.stopFalling();
 				}
 			} else {
-                //console.log(sprite.falling);
-                //console.log(!this.JudgeBelowHasObstacle(sprite));
                 //判断是否在跳跃过程中，或者是否下方无障碍物
 				if(!sprite.jumping && !this.JudgeBelowHasObstacle(sprite)) {
                     sprite.fall(); 	
 				} 
 			}
 		}
+    },
+    equipRunnerForJumping:function(){
+		var INITIAL_TRACK = 0;
+		
+		this.runner.JUMP_HEIGHT = 120;
+		this.runner.JUMP_DURATION = 1400;
+		
+		this.runner.jumping = false;
+		this.runner.track = INITIAL_TRACK;
+		//上升
+		//this.runner.ascendTimer = new Stopwatch();
+		//下降
+		//this.runner.descendTimer = new Stopwatch();
+		
+		
+		this.runner.ascendTimer = new AnimationTimer(this.runner.JUMP_DURATION / 2, AnimationTimer.makeEaseOutEasingFunction(1.15));
+		this.runner.descendTimer = new AnimationTimer(this.runner.JUMP_DURATION / 2, AnimationTimer.makeEaseInEasingFunction(1.15));
+		
+		
+		this.runner.jump = function(){
+			//nb，膜拜中
+			if(this.jumping){
+				return;
+			}
+			this.jumping = true;
+			
+			this.runAnimationRate = 0;
+			this.verticalLaunchPosition = this.top;
+			this.ascendTimer.start(snailBait.timeSystem.calculateGameTime());
+			//console.log(snailBait.timeSystem.calculateGameTime());
+			//console.log(+new Date());
+		};
+		this.runner.stopJumping = function(){
+			this.ascendTimer.stop(snailBait.timeSystem.calculateGameTime());
+			this.descendTimer.stop(snailBait.timeSystem.calculateGameTime());
+			this.runAnimationRate = snailBait.RUN_ANIMATION_RATE;
+			this.jumping = false;
+		}
 	},
+    jumpBehavior:{
+		isAscending:function(sprite){
+			return sprite.ascendTimer.isRunning();
+		},
+		ascend:function(sprite,now){
+			var elapsed = sprite.ascendTimer.getElapsedTime(now);
+			var deltaY = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
+			sprite.top = sprite.verticalLaunchPosition - deltaY;//向上
+			
+		},
+		isDoneAscending:function(sprite,now){
+			//console.log(sprite.type+now);
+			//console.log(sprite.ascendTimer.getElapsedTime(now)+"/"+sprite.JUMP_DURATION / 2);
+			
+			return sprite.ascendTimer.getElapsedTime(now) > sprite.JUMP_DURATION / 2;
+		},
+		finishAscent:function(sprite,now){
+			sprite.jumpApex = sprite.top;
+			sprite.ascendTimer.stop(now);
+			sprite.descendTimer.start(now);
+		},
+		isDescending:function(sprite){
+			return sprite.descendTimer.isRunning();
+		},
+		descend:function(sprite,now){
+			var elapsed = sprite.descendTimer.getElapsedTime(now);
+			var deltaY = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
+			sprite.top = sprite.jumpApex + deltaY;//向下
+		},
+		isDoneDescending:function(sprite,now){
+			return sprite.descendTimer.getElapsedTime(now) > sprite.JUMP_DURATION/2;
+		},
+		finishDescent:function(sprite,now){
+			sprite.stopJumping();
+			//如果在平台上
+			if(snailBait.platformUnderneath(sprite) || sprite.track === 0 ){
+				//verticalLaunchPosition初始高度
+				sprite.top = sprite.verticalLaunchPosition;
+				
+			}else{
+				//sprite.top = sprite.verticalLaunchPosition;
+				sprite.fall(snailBait.GRAVITY_FORCE * 
+					(sprite.descendTimer.getElapsedTime(now) / 1000) *
+					snailBait.PIXELS_PER_METER);
+			}
+		},
+		pause:function(sprite){
+			if(sprite.ascendTimer.isRunning()){
+				sprite.ascendTimer.pause();
+			}else if(sprite.descendTimer.isRunning()){
+				sprite.descendTimer.pause();
+			}
+		},
+		unpause:function(sprite){
+			if(sprite.ascendTimer.isRunning()){
+				sprite.ascendTimer.unpause();
+			}else if(sprite.descendTimer.isRunning()){
+				sprite.descendTimer.unpause();
+			}
+		},
+		execute:function(sprite,now,fps,context,lastAnimationFrameTime){
+			if(!sprite.jumping || sprite.track === 4){
+				return;
+			}
+			//console.log(sprite.ascendTimer.stopwatch.getElapsedTime(now));
+			//console.log(sprite.ascendTimer.stopwatch.running);
+			//console.log(this.isAscending(sprite));
+
+			if(this.isAscending(sprite)){
+				//上升阶段
+				if(!this.isDoneAscending(sprite,now)){	
+					//console.log(sprite.ascendTimer.getElapsedTime(now) > sprite.JUMP_DURATION / 2);
+					//判断上升是否结束
+					this.ascend(sprite,now);				//上升
+				}else{
+
+					this.finishAscent(sprite,now);		//结束上升
+				}
+			}else if(this.isDescending(sprite)){
+				//下降阶段
+				if(! this.isDoneDescending(sprite,now)){	//判断下降是否结束
+					this.descend(sprite,now);				//下降
+				}else{
+					this.finishDescent(sprite,now);			//下降结束
+				}
+			}
+		}
+	}
 }
