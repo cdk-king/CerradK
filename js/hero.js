@@ -43,7 +43,7 @@ var hero = {
         opacity:1,
         velocityX:0,
         velocityY:0,
-        behaviors:["runBehavior","fallBehavior"],
+        behaviors:["runBehavior","fallBehavior","jumpBehavior"],
         lastAdvanceTime:0,
         orders:{
             type:"stand"
@@ -61,18 +61,18 @@ var hero = {
             }
 
             for(var i = 0;i < this.behaviors.length;++i){
-                hero[this.behaviors[i]].execute(this,new Date().getTime(),30,"",game.lastAnimationFrameTime);
+                hero[this.behaviors[i]].execute(this,game.timeSystem.calculateGameTime(),30,"",game.lastAnimationFrameTime);
             }
         },
         draw:function(){
-            this.drawingX = this.x;
-            this.drawingY = this.y;
+            this.drawingX = this.x-(game.offsetX/game.gridSize);
+            this.drawingY = this.y-(game.offsetY/game.gridSize);
             if(this.selected){
                 //this.drawSelection();
                 this.drawLifeBar();
             } 
             game.foregroundContext.drawImage(this.spriteSheet,this.imageOffset*this.pixelWidth,(this.direction+1)*this.pixelHeight,
-                this.pixelWidth,this.pixelHeight,this.x*game.gridSize,this.y*game.gridSize,this.pixelWidth,this.pixelHeight);
+                this.pixelWidth,this.pixelHeight,this.x*game.gridSize,this.drawingY*game.gridSize,this.pixelWidth,this.pixelHeight);
 
             //绘制出现的光圈
             if(this.brightness){
@@ -91,6 +91,42 @@ var hero = {
     },
     load:loadItem,
     add:addItem,
+    GRAVITY_FORCE:9.81,
+    RUN_ANIMATION_RATE:30,
+    CANVAS_WIDTH_IN_METERS:10,
+    JudgeBelowHasObstacle:function(sprite){
+        //todo
+        //二维数组可以存item的id
+
+        var x = Math.floor((sprite.x*game.gridSize+game.offsetX)/game.gridSize);
+        //var y = Math.floor(sprite.y+sprite.pixelHeight/game.gridSize);
+        var y = Math.floor(sprite.y)+3;
+
+        var re = game.currentMapTerrainGrid[x][y];
+        var left = game.currentMapTerrainGrid[x-1][y];
+        var right = game.currentMapTerrainGrid[x+1][y];
+
+        if(re==undefined || right == undefined){
+            return false; 
+        }
+
+        if(right==0){
+            //重新校准
+            if(re!=0){
+                sprite.y = y-3;
+            }
+
+            return (re!=0);
+        }else if(right!=0){
+            //重新校准
+            sprite.y = y-3;
+            return true;
+        }else{
+            return false;
+        }
+
+        //var item = game.getItemByUid(re);
+    },
     runBehavior:{
 		lastAdvanceTime:0,
 		execute:function(sprite,now,fps,context,lastAnimationFrameTime){
@@ -117,75 +153,59 @@ var hero = {
         var runner = game.hero[0];
 		runner.fallTimer = new AnimationTimer();
 	    runner.falling = false;
-		runner.fall = function(a) {
+		runner.fall = function(a,b) {
 			this.falling = true;
 			this.velocityY = a || 0;
             this.initialVelocityY = a || 0;
-            //console.log(game.timeSystem.calculateGameTime());
+            this.initStartTime = b || 0;
+            //console.log(this.initStartTime);
+            //console.log(game.timeSystem.calculateGameTime())
             //this.fallTimer.start(game.timeSystem.calculateGameTime())
-			this.fallTimer.start(new Date().getTime())
+			this.fallTimer.start(game.timeSystem.calculateGameTime()-this.initStartTime);
 		};
 	    runner.stopFalling = function() {
 			this.falling = false;
             this.velocityY = 0;
             //this.fallTimer.stop(game.timeSystem.calculateGameTime())
-			this.fallTimer.stop(new Date().getTime())
+			this.fallTimer.stop(game.timeSystem.calculateGameTime())
 		}
 	},
     fallBehavior:{
-        GRAVITY_FORCE:9.81,
-        CANVAS_WIDTH_IN_METERS:20,
-	    PIXELS_PER_METER:game.canvasWidth / this.CANVAS_WIDTH_IN_METERS,
+	    //PIXELS_PER_METER:game.canvasWidth / hero.CANVAS_WIDTH_IN_METERS,
 		pause: function(sprite, lastAnimationFrameTime) { c.fallTimer.pause(lastAnimationFrameTime) },
 		unpause: function(sprite, lastAnimationFrameTime) { c.fallTimer.unpause(lastAnimationFrameTime) },
-		setSpriteVelocity: function(sprite, lastAnimationFrameTime) {
+		setSpriteVelocity: function(sprite, now,lastAnimationFrameTime) {
             //PIXELS_PER_METERS(* pre)
-            var pre = game.canvasWidth / this.CANVAS_WIDTH_IN_METERS;
+            var pre = game.canvasWidth / hero.CANVAS_WIDTH_IN_METERS;
             //console.log(pre);
-			sprite.velocityY = sprite.initialVelocityY + this.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime(lastAnimationFrameTime) / 1000) * pre;
-		},
+
+            //console.log(sprite.initialVelocityY);
+			sprite.velocityY = sprite.initialVelocityY + hero.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime(now) / 1000) * pre;
+            //console.log(sprite.velocityY );
+        },
 		calculateVerticalDrop: function(sprite, now, lastAnimationFrameTime) {			
 			return sprite.velocityY * (now - lastAnimationFrameTime) / 1000;
 		},
-        JudgeBelowHasObstacle:function(sprite){
-            //todo
-            //二维数组可以存item的id
-
-            var x = Math.floor((sprite.x*game.gridSize+game.offsetX)/game.gridSize);
-            //var y = Math.floor(sprite.y+sprite.pixelHeight/game.gridSize);
-            var y = Math.floor(sprite.y+game.offsetY)+3;
-
-            var re = game.currentMapTerrainGrid[x][y];
-            var left = game.currentMapTerrainGrid[x-1][y];
-            var right = game.currentMapTerrainGrid[x+1][y];
-
-            if(right==0){
-                //重新校准
-                if(re!=0){
-                    sprite.y = y-3;
-                }
-
-                return (re!=0);
-            }
-            return true; 
-            //var item = game.getItemByUid(re);
-        },
+        
 		//e sprite | d now | b last
 		moveDown: function(sprite,now,lastAnimationFrameTime) {
+            
 			var c;
-			this.setSpriteVelocity(sprite, lastAnimationFrameTime);
+			this.setSpriteVelocity(sprite,now, lastAnimationFrameTime);
             c = this.calculateVerticalDrop(sprite,now,lastAnimationFrameTime);
 
-            if(this.JudgeBelowHasObstacle(sprite)) {
+            if(hero.JudgeBelowHasObstacle(sprite)) {
                 sprite.stopFalling();
             } else {
                 sprite.y += c/game.gridSize;
+                game.offsetY += c;
             }
         },
 		execute: function(sprite,now,fps,context,lastAnimationFrameTime) {
 			if(sprite.falling) {
                 //判断是否下方无障碍物
-				if(!this.JudgeBelowHasObstacle(sprite)) {
+                //console.log(!hero.JudgeBelowHasObstacle(sprite));
+				if(!hero.JudgeBelowHasObstacle(sprite)) {
                     //下方无障碍物
 					this.moveDown(sprite,now,lastAnimationFrameTime) 
 				} else {
@@ -194,31 +214,33 @@ var hero = {
 				}
 			} else {
                 //判断是否在跳跃过程中，或者是否下方无障碍物
-				if(!sprite.jumping && !this.JudgeBelowHasObstacle(sprite)) {
+				if(!sprite.jumping && !hero.JudgeBelowHasObstacle(sprite)) {
                     sprite.fall(); 	
 				} 
 			}
 		}
     },
     equipRunnerForJumping:function(){
+
+        var runner = game.hero[0];
+        
 		var INITIAL_TRACK = 0;
 		
-		this.runner.JUMP_HEIGHT = 120;
-		this.runner.JUMP_DURATION = 1400;
+		runner.JUMP_HEIGHT = 100;
+		runner.JUMP_DURATION = 1000;
 		
-		this.runner.jumping = false;
-		this.runner.track = INITIAL_TRACK;
+		runner.jumping = false;
+		runner.track = INITIAL_TRACK;
 		//上升
 		//this.runner.ascendTimer = new Stopwatch();
 		//下降
 		//this.runner.descendTimer = new Stopwatch();
 		
+        //配合下落时间和高度手动模拟短时重力
+		runner.ascendTimer = new AnimationTimer(runner.JUMP_DURATION / 2, AnimationTimer.makeEaseOutEasingFunction(1.13));
+		runner.descendTimer = new AnimationTimer(runner.JUMP_DURATION / 2, AnimationTimer.makeEaseInEasingFunction(1.13));
 		
-		this.runner.ascendTimer = new AnimationTimer(this.runner.JUMP_DURATION / 2, AnimationTimer.makeEaseOutEasingFunction(1.15));
-		this.runner.descendTimer = new AnimationTimer(this.runner.JUMP_DURATION / 2, AnimationTimer.makeEaseInEasingFunction(1.15));
-		
-		
-		this.runner.jump = function(){
+		runner.jump = function(){
 			//nb，膜拜中
 			if(this.jumping){
 				return;
@@ -226,15 +248,15 @@ var hero = {
 			this.jumping = true;
 			
 			this.runAnimationRate = 0;
-			this.verticalLaunchPosition = this.top;
-			this.ascendTimer.start(snailBait.timeSystem.calculateGameTime());
-			//console.log(snailBait.timeSystem.calculateGameTime());
-			//console.log(+new Date());
+            this.verticalLaunchPosition = this.y;
+            //console.log(game.timeSystem.calculateGameTime());
+			this.ascendTimer.start(game.timeSystem.calculateGameTime());
+
 		};
-		this.runner.stopJumping = function(){
-			this.ascendTimer.stop(snailBait.timeSystem.calculateGameTime());
-			this.descendTimer.stop(snailBait.timeSystem.calculateGameTime());
-			this.runAnimationRate = snailBait.RUN_ANIMATION_RATE;
+		runner.stopJumping = function(){
+			this.ascendTimer.stop(game.timeSystem.calculateGameTime());
+			this.descendTimer.stop(game.timeSystem.calculateGameTime());
+			this.runAnimationRate = hero.RUN_ANIMATION_RATE;
 			this.jumping = false;
 		}
 	},
@@ -244,18 +266,16 @@ var hero = {
 		},
 		ascend:function(sprite,now){
 			var elapsed = sprite.ascendTimer.getElapsedTime(now);
-			var deltaY = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
-			sprite.top = sprite.verticalLaunchPosition - deltaY;//向上
-			
+			var deltaY = (elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT)/game.gridSize;
+            sprite.y = sprite.verticalLaunchPosition - deltaY;//向上
+			game.offsetY = (sprite.y - sprite.oy)*game.gridSize;
 		},
 		isDoneAscending:function(sprite,now){
-			//console.log(sprite.type+now);
-			//console.log(sprite.ascendTimer.getElapsedTime(now)+"/"+sprite.JUMP_DURATION / 2);
 			
 			return sprite.ascendTimer.getElapsedTime(now) > sprite.JUMP_DURATION / 2;
 		},
 		finishAscent:function(sprite,now){
-			sprite.jumpApex = sprite.top;
+			sprite.jumpApex = sprite.y;
 			sprite.ascendTimer.stop(now);
 			sprite.descendTimer.start(now);
 		},
@@ -264,24 +284,27 @@ var hero = {
 		},
 		descend:function(sprite,now){
 			var elapsed = sprite.descendTimer.getElapsedTime(now);
-			var deltaY = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
-			sprite.top = sprite.jumpApex + deltaY;//向下
+			var deltaY = (elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT)/game.gridSize;
+            sprite.y = sprite.jumpApex + deltaY;//向下
+            game.offsetY = (sprite.y - sprite.oy)*game.gridSize;
+            //console.log(hero.GRAVITY_FORCE * (sprite.descendTimer.getElapsedTime(now) / 1000) *32);
 		},
 		isDoneDescending:function(sprite,now){
 			return sprite.descendTimer.getElapsedTime(now) > sprite.JUMP_DURATION/2;
 		},
 		finishDescent:function(sprite,now){
+            var PIXELS_PER_METER = game.canvasWidth / hero.CANVAS_WIDTH_IN_METERS;
 			sprite.stopJumping();
 			//如果在平台上
-			if(snailBait.platformUnderneath(sprite) || sprite.track === 0 ){
+			if(hero.JudgeBelowHasObstacle(sprite)){
 				//verticalLaunchPosition初始高度
-				sprite.top = sprite.verticalLaunchPosition;
-				
+				//sprite.y = sprite.verticalLaunchPosition;
+				game.offsetY = (sprite.y - sprite.oy)*game.gridSize;
 			}else{
-				//sprite.top = sprite.verticalLaunchPosition;
-				sprite.fall(snailBait.GRAVITY_FORCE * 
+                //console.log(hero.GRAVITY_FORCE * (sprite.descendTimer.getElapsedTime(now) / 1000) *32);
+				sprite.fall(hero.GRAVITY_FORCE * 
 					(sprite.descendTimer.getElapsedTime(now) / 1000) *
-					snailBait.PIXELS_PER_METER);
+					PIXELS_PER_METER,sprite.descendTimer.getElapsedTime(now));
 			}
 		},
 		pause:function(sprite){
@@ -299,17 +322,13 @@ var hero = {
 			}
 		},
 		execute:function(sprite,now,fps,context,lastAnimationFrameTime){
-			if(!sprite.jumping || sprite.track === 4){
+			if(!sprite.jumping){
 				return;
-			}
-			//console.log(sprite.ascendTimer.stopwatch.getElapsedTime(now));
-			//console.log(sprite.ascendTimer.stopwatch.running);
-			//console.log(this.isAscending(sprite));
+            }
 
 			if(this.isAscending(sprite)){
-				//上升阶段
+                //上升阶段
 				if(!this.isDoneAscending(sprite,now)){	
-					//console.log(sprite.ascendTimer.getElapsedTime(now) > sprite.JUMP_DURATION / 2);
 					//判断上升是否结束
 					this.ascend(sprite,now);				//上升
 				}else{
@@ -318,8 +337,14 @@ var hero = {
 				}
 			}else if(this.isDescending(sprite)){
 				//下降阶段
-				if(! this.isDoneDescending(sprite,now)){	//判断下降是否结束
-					this.descend(sprite,now);				//下降
+                if(! this.isDoneDescending(sprite,now)){	//判断下降是否结束
+                    
+                    if(hero.JudgeBelowHasObstacle(sprite)) {
+                        this.finishDescent(sprite,now);			//下降结束
+                    }else{
+                        this.descend(sprite,now);				//下降
+                    }
+					
 				}else{
 					this.finishDescent(sprite,now);			//下降结束
 				}

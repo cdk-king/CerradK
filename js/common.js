@@ -112,6 +112,13 @@ function addItem(details){
     Object.assign(item, this.defaults);
 
     Object.assign(item, this.list[name]);
+    //设定原始坐标
+    if(details.x){
+        item.ox = details.x;
+    }
+    if(details.y){
+        item.oy = details.y;
+    }
 
     item.life = item.hitPoints;
 

@@ -57,6 +57,12 @@ var keyboard = {
                             
                         }
                         break;
+                    case "32":
+                        console.log("按 space");
+                        if(game.running){
+                            game.hero[0].jump();
+                        }
+                        break;
                     
                 }
             }

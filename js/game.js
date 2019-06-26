@@ -263,15 +263,21 @@ var game = {
 
         //装备跌落系统
         hero.equipFalling();
+        hero.equipRunnerForJumping();
 
         //加载地形
-        maps.createFlatTerrain("soil",-10,26,60,4);
+        maps.createFlatTerrain("soil",15,26,10,2);
+        maps.createFlatTerrain("soil",10,30,10,2);
+        maps.createFlatTerrain("soil",5,34,10,2);
+        maps.createFlatTerrain("soil",20,38,10,2);
+        maps.createFlatTerrain("soil",25,42,10,2);
+        maps.createFlatTerrain("soil",30,46,10,2);
 
         //创建网格，将不可通过的网格单位赋值1，可通行的赋值0
         game.currentMapTerrainGrid = [];
         for(var x = -50;x<150;x++){
             game.currentMapTerrainGrid[x] = [];
-            for(var y = 0;y<50;y++){
+            for(var y = 0;y<150;y++){
                 game.currentMapTerrainGrid[x][y] = 0;
             }
         };
@@ -281,7 +287,7 @@ var game = {
             game.currentMapTerrainGrid[item.x][item.y] = item.uid;
         };
 
-        console.log(game.currentMapTerrainGrid);
+        //console.log(game.currentMapTerrainGrid);
 
         //加载器加载完后才开始绘制
         loader.onload = function(){
@@ -306,7 +312,7 @@ var game = {
         //develop.animate();
     },
     drawingLoop:function(){
-        var now = new Date().getTime();
+        var now = game.timeSystem.calculateGameTime();
         //console.log(now - game.lastAnimationFrameTime);
         game.animationLoop(now);
 
@@ -335,7 +341,7 @@ var game = {
         
         //develop.draw();
 
-        game.lastAnimationFrameTime = new Date().getTime();
+        game.lastAnimationFrameTime = game.timeSystem.calculateGameTime();
 
         if(game.running){
             //游戏绘画循环
