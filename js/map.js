@@ -17,12 +17,15 @@ var maps = {
                 "buildings":[],
                 "vehicles":[],
                 "aircraft":[],
-                "terrain":["soil"]
+                "terrain":["soil","soil0","soil1","soil2"],
+                "plant":["grass","flower"]
             },
             "cash":0,
             //预加载的单位项
             "items":[
                 {"type":"hero","name":"cdk",x:20,y:15,"life":100},
+                {"type":"plant","name":"grass",x:18,y:25,"life":100},
+                {"type":"plant","name":"flower",x:22,y:25,"life":100},
                 // {"type":"terrain","name":"soil",x:300,y:416,"life":10},
                 // {"type":"terrain","name":"soil",x:316,y:416,"life":10},
                 // {"type":"terrain","name":"soil",x:332,y:416,"life":10},

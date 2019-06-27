@@ -140,6 +140,7 @@ var game = {
         game.vehicles = [];
         game.aircraft = [];
         game.terrain = [];
+        game.plant = [];
         game.hero = [];
 
         game.selectedItems = [];
@@ -266,12 +267,12 @@ var game = {
         hero.equipRunnerForJumping();
 
         //加载地形
-        maps.createFlatTerrain("soil",15,26,10,2);
-        maps.createFlatTerrain("soil",10,30,10,2);
-        maps.createFlatTerrain("soil",5,34,10,2);
-        maps.createFlatTerrain("soil",20,38,10,2);
-        maps.createFlatTerrain("soil",25,42,10,2);
-        maps.createFlatTerrain("soil",30,46,10,2);
+        maps.createFlatTerrain("soil2",15,26,10,1);
+        maps.createFlatTerrain("soil1",10,30,10,1);
+        maps.createFlatTerrain("soil0",5,34,10,1);
+        maps.createFlatTerrain("soil2",20,38,10,1);
+        maps.createFlatTerrain("soil1",25,42,10,1);
+        maps.createFlatTerrain("soil0",30,46,10,1);
 
         //创建网格，将不可通过的网格单位赋值1，可通行的赋值0
         game.currentMapTerrainGrid = [];

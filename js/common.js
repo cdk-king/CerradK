@@ -120,6 +120,15 @@ function addItem(details){
         item.oy = details.y;
     }
 
+    switch(item.type){
+        case "plant":
+            setPlantRandomStyle(item);
+        break;
+        case "terrain":
+            setTerrainStyle(item);
+        break;
+    }
+
     item.life = item.hitPoints;
 
     item.isAdd = true;
@@ -127,4 +136,19 @@ function addItem(details){
     Object.assign(item, details);
 
     return item;
+}
+
+function setPlantRandomStyle(item){
+    item.sheetX += Math.floor(Math.random()*item.styleCount)*item.pixelWidth;
+    console.log(Math.floor(Math.random()*item.styleCount));
+}
+
+function setTerrainStyle(item){
+    var top = terrain.justTopHasTerrainItem(item);
+    var left = terrain.justLeftHasTerrainItem(item);
+    var right = terrain.justRightHasTerrainItem(item);
+    var bottom = terrain.justBottomHasTerrainItem(item);
+    if(top==null){
+        item.sheetX = 18;
+    }
 }
