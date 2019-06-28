@@ -13,12 +13,14 @@ var keyboard = {
                     case "27":// 按 Esc
                         console.log("按 esc");
                         if(game.running){
+                            sounds.stopPollMusicFlag=true;
                             game.showMessageBox("是否退回菜单界面",function(){
                                 //game.end();
                                 game.running = false;
                                 game.hideScreens();
                                 game.showScreen("gamestartscreen");
                             },function(){
+                                sounds.stopPollMusicFlag=false;
                                 game.hideScreen("messageboxscreen");
                             });
                         }

@@ -15,6 +15,16 @@ var loader = {
         image.onload = loader.itemLoaded;
         return image;
     },
+    soundFileExtn:".mp3",
+    loadSound:function(url){
+        this.totalCount++;
+        this.loaded = false;
+        game.showScreen("loadingscreen");
+        var audio = new Audio();
+        audio.src = url +loader.soundFileExtn;
+        audio.addEventListener("canplaythrough",loader.itemLoaded,false);
+        return audio;
+    },
     itemLoaded:function(ev){
         //console.log(ev.target.callback);
         if(ev.target.callback){

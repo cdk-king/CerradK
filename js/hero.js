@@ -105,19 +105,24 @@ var hero = {
         var re = game.currentMapTerrainGrid[x][y];
         var left = game.currentMapTerrainGrid[x-1][y];
         var right = game.currentMapTerrainGrid[x+1][y];
+        var top = game.currentMapTerrainGrid[x][y-1];
+        var topRight = game.currentMapTerrainGrid[x+1][y-1];
+        var bottom = game.currentMapTerrainGrid[x][y+1];
 
+
+        //超出数组
         if(re==undefined || right == undefined){
             return false; 
         }
 
         if(right==0){
             //重新校准
-            if(re!=0){
+            if(re!=0 && top==0 && topRight==0){
                 sprite.y = y-3;
             }
 
-            return (re!=0);
-        }else if(right!=0){
+            return (re!=0 && top==0 && topRight==0);
+        }else if(right!=0 && top==0 && topRight==0){
             //重新校准
             sprite.y = y-3;
             return true;

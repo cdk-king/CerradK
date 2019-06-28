@@ -15,11 +15,15 @@ var game = {
     init:function(){
         loader.init();
         keyboard.init();
+        mouse.init();
+        sounds.init();
+        sidebar.init();
 
         game.hideScreens();
         game.showScreen("gamestartscreen");
         game.initCanvases();
     },
+    scale:1,
     resize:function(){
 
     },
@@ -267,12 +271,14 @@ var game = {
         hero.equipRunnerForJumping();
 
         //加载地形
-        maps.createFlatTerrain("soil2",15,26,10,1);
-        maps.createFlatTerrain("soil1",10,30,10,1);
-        maps.createFlatTerrain("soil0",5,34,10,1);
+        maps.createFlatTerrain("soil2",15,26,10,2);
+        maps.createFlatTerrain("soil1",10,30,10,2);
+        maps.createFlatTerrain("soil0",5,34,10,2);
         maps.createFlatTerrain("soil2",20,38,10,1);
         maps.createFlatTerrain("soil1",25,42,10,1);
         maps.createFlatTerrain("soil0",30,46,10,1);
+
+        resetAllTerrainStyle();
 
         //创建网格，将不可通过的网格单位赋值1，可通行的赋值0
         game.currentMapTerrainGrid = [];
@@ -294,6 +300,8 @@ var game = {
         loader.onload = function(){
             game.lastAnimationFrameTime = new Date().getTime();
             game.showScreen("gameinterfacescreen");
+            //sounds.play("background");
+            sounds.pollMusic("background");
             game.drawingLoop();
         }
         
@@ -310,7 +318,7 @@ var game = {
             game.items[i].animate();
         }
 
-        //develop.animate();
+        //sidebar.animate();
     },
     drawingLoop:function(){
         var now = game.timeSystem.calculateGameTime();
@@ -340,7 +348,9 @@ var game = {
              game.items[i].draw();
         }
         
-        //develop.draw();
+        //sidebar.draw();
+
+        mouse.draw();
 
         game.lastAnimationFrameTime = game.timeSystem.calculateGameTime();
 

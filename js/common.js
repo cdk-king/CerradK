@@ -125,7 +125,7 @@ function addItem(details){
             setPlantRandomStyle(item);
         break;
         case "terrain":
-            setTerrainStyle(item);
+            //setTerrainStyle(item);
         break;
     }
 
@@ -148,7 +148,59 @@ function setTerrainStyle(item){
     var left = terrain.justLeftHasTerrainItem(item);
     var right = terrain.justRightHasTerrainItem(item);
     var bottom = terrain.justBottomHasTerrainItem(item);
-    if(top==null){
+    if(top==null && left!=null && right!=null && bottom!=null){
         item.sheetX = 18;
+        item.sheetY = 0;
+    }
+    if(top!=null && left!=null && right!=null && bottom==null){
+        item.sheetX = 18;
+        item.sheetY = 36;
+    }
+    if(top==null && left!=null && right!=null && bottom==null){
+        item.sheetX = 108;
+        item.sheetY = 72;
+    }
+    if(top==null && left==null && right!=null && bottom==null){
+        item.sheetX = 162;
+        item.sheetY = 0;
+    }
+    if(top==null && left!=null && right==null && bottom==null){
+        item.sheetX = 216;
+        item.sheetY = 0;
+    }
+    if(top==null && left==null && right!=null && bottom!=null){
+        item.sheetX = 36;
+        item.sheetY = 54;
+    }
+    if(top!=null && left==null && right!=null && bottom==null){
+        item.sheetX = 36;
+        item.sheetY = 72;
+    }
+    if(top==null && left!=null && right==null && bottom!=null){
+        item.sheetX = 54;
+        item.sheetY = 54;
+    }
+    if(top!=null && left!=null && right==null && bottom==null){
+        item.sheetX = 54;
+        item.sheetY = 72;
+    }
+    if(top!=null && left==null && right!=null && bottom!=null){
+        item.sheetX = 0;
+        item.sheetY = 18;
+    }
+    if(top!=null && left!=null && right==null && bottom!=null){
+        item.sheetX = 72;
+        item.sheetY = 36;
+    }
+    if(top!=null && left!=null && right!=null && bottom!=null){
+        item.sheetX = 18;
+        item.sheetY = 18;
+    }
+}
+
+function resetAllTerrainStyle(){
+    for(var i = 0;i<game.terrain.length;i++){
+        var item = game.terrain[i];
+        setTerrainStyle(item);
     }
 }
