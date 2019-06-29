@@ -20,8 +20,8 @@ var sidebar = {
     drawToolBar:function(){
         //
         this.context.fillStyle = "rgba(0,0,0,0.7)";
+        this.context.beginPath();
         this.context.rect(100,100,100,100);
         this.context.fill();
-
     }
 }

@@ -348,7 +348,7 @@ var game = {
              game.items[i].draw();
         }
         
-        //sidebar.draw();
+        sidebar.draw();
 
         mouse.draw();
 

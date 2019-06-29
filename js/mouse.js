@@ -40,6 +40,7 @@ var mouse = {
             var width = Math.abs(this.gameX-this.dragX);
             var height = Math.abs(this.gameY-this.dragY);
             game.foregroundContext.strokeStyle = "white";
+            game.foregroundContext.beginPath();
             game.foregroundContext.strokeRect(x-game.offsetX,y-game.offsetY,width,height);
 
         }
