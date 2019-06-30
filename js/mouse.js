@@ -82,6 +82,8 @@ var mouse = {
     },
     leftClick: function(shiftPressed) {
         console.log("左击");
+        console.log(mouse.gridX);
+        sidebar.createItem(mouse.gridX,mouse.gridY);
     },
     finishDragSelection: function(shiftPressed) {
         

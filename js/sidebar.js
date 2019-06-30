@@ -11,17 +11,33 @@ var sidebar = {
         
     },
     draw:function(){
-        //这段代码会无限消耗资源，有bug
         this.context.clearRect(0,0,game.canvasWidth,game.canvasHeight);
-        this.drawToolBar();
-        game.foregroundContext.drawImage(this.canvas,0,0,
-        game.canvasWidth,game.canvasHeight,0,0,game.canvasWidth,game.canvasHeight);
+        if(sidebar.showToolBar){
+            
+            this.drawToolBar();
+            game.foregroundContext.drawImage(this.canvas,0,0,
+            game.canvasWidth,game.canvasHeight,0,0,game.canvasWidth,game.canvasHeight);
+        }
     },
+    showToolBar:true,
+    toolBarX:180,
+    toolBarY:440,
+    toolBarWidth:280,
+    toolBarHeight:32,
     drawToolBar:function(){
         //
-        this.context.fillStyle = "rgba(0,0,0,0.7)";
+        this.context.fillStyle = "rgba(255,255,255,0.5)";
         this.context.beginPath();
-        this.context.rect(100,100,100,100);
+        this.context.rect(sidebar.toolBarX,sidebar.toolBarY,sidebar.toolBarWidth,sidebar.toolBarHeight);
         this.context.fill();
+    },
+    itemName:"soil2",
+    createItem:function(x,y){
+        var detail =  {"type":"terrain","name":sidebar.itemName,x:300,y:416,"life":10};
+        detail.x = x;
+        detail.y = y;
+        var item = game.addItem(detail);
+        game.currentMapTerrainGrid[x][y] = item.uid;
+        resetAllTerrainStyle();
     }
 }

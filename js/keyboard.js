@@ -5,11 +5,16 @@ var keyboard = {
             
             var e = event || window.event || arguments.callee.caller.arguments[0];
             var currKey=e.keyCode||e.which||e.charCode;
-            //console.log("按下键盘");
+            //console.log(currKey.toString());
 
             if(e){ 
                 //console.log(currKey.toString());
                 switch (currKey.toString()){
+                    case "81"://tab
+                        if(game.running){
+                            sidebar.showToolBar = !sidebar.showToolBar;
+                        }
+                        break;
                     case "27":// 按 Esc
                         console.log("按 esc");
                         if(game.running){
