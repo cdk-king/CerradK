@@ -94,6 +94,40 @@ var hero = {
     GRAVITY_FORCE:9.81,
     RUN_ANIMATION_RATE:30,
     CANVAS_WIDTH_IN_METERS:10,
+    JudgeRightOrLeftHasObstacle:function(sprite){
+        var x = Math.floor((sprite.x*game.gridSize+game.offsetX)/game.gridSize);
+        var y = Math.floor(sprite.y)+2;
+        var arr = [];
+        var re = game.currentMapTerrainGrid[x][y-1];
+        var right = game.currentMapTerrainGrid[x+1][y];
+        var left = game.currentMapTerrainGrid[x-1][y];
+
+
+        for(var i=4;i>0;i--){
+            for(var j = 3;j>0;j--){
+                var uid = game.currentMapTerrainGrid[x-2+i][y-2+j];
+                var item = game.getItemByUid(uid);
+                if(item!=false){
+                    arr.push(item);
+                }
+            }
+        }
+
+        for(var i = 0;i<arr.length;i++){
+
+        }
+
+        //var item = game.getItemByUid(left);
+        
+        console.log(arr);
+        
+        //超出数组
+        if(left==undefined || right == undefined){
+            return false; 
+        }
+
+        return false;
+    },
     JudgeBelowHasObstacle:function(sprite){
         //todo
         //二维数组可以存item的id
@@ -140,15 +174,14 @@ var hero = {
                 sprite.lastAdvanceTime = now;
             }
             if(sprite.running){
-                if(now-sprite.lastAdvanceTime > 100){
-                    sprite.imageOffset++;
-                    if(sprite.imageOffset>=sprite.spriteImages[0].count){
-                        sprite.imageOffset=0;
+                    if(now-sprite.lastAdvanceTime > 100 ){
+                        sprite.imageOffset++;
+                        if(sprite.imageOffset>=sprite.spriteImages[0].count){
+                            sprite.imageOffset=0;
+                        }
+                        //console.log(this.imageOffset);
+                        sprite.lastAdvanceTime = now; 
                     }
-                    //console.log(this.imageOffset);
-                    sprite.lastAdvanceTime = now;
-                }
-                
             }else{
                 sprite.imageOffset =  0;
             }

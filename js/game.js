@@ -107,11 +107,19 @@ var game = {
 		game.backgroundContext.translate(game.backgroundOffset, 0);
     },
     setGameOffsetX:function(now){
-        game.offsetX += game.bgVelocity * (now - game.lastAnimationFrameTime) / 1000;
+        var sprite = game.hero[0];
+        console.log(hero.JudgeRightOrLeftHasObstacle(sprite));
+        if(!hero.JudgeRightOrLeftHasObstacle(sprite)){
+            game.offsetX += game.bgVelocity * (now - game.lastAnimationFrameTime) / 1000;
+        }
+        
     },
     setBackgroundOffset: function(now) {
-
-		game.backgroundOffset += game.bgVelocity * (now - game.lastAnimationFrameTime) / 1000;
+        var sprite = game.hero[0];
+        if(!hero.JudgeRightOrLeftHasObstacle(sprite)){
+            game.backgroundOffset += game.bgVelocity * (now - game.lastAnimationFrameTime) / 1000;
+        }
+		
         //console.log(game.backgroundOffset);
 		if(game.backgroundOffset < 0 || game.backgroundOffset > game.backgroundWidth) {
 			
